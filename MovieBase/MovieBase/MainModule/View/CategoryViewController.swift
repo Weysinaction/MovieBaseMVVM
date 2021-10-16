@@ -15,7 +15,8 @@ final class CategoryViewController: UIViewController {
 
     // MARK: public properties
 
-    var presenter: MainViewPresenterProtocol!
+    var viewModel: CategoryViewModelProtocol!
+    var router: RouterProtocol?
 
     // MARK: CategoryViewController
 
@@ -23,7 +24,9 @@ final class CategoryViewController: UIViewController {
         super.viewDidLoad()
 
         setupViewController()
-        presenter.getMovies()
+        viewModel.getMovies {
+            self.tableView.reloadData()
+        }
     }
 
     // MARK: Private methods
@@ -55,7 +58,7 @@ final class CategoryViewController: UIViewController {
 
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        presenter.films?.count ?? 0
+        viewModel.films?.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -63,7 +66,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             .dequeueReusableCell(withIdentifier: filmCellID, for: indexPath) as? FilmTableViewCell
         else { return UITableViewCell() }
 
-        guard let film = presenter.films?[indexPath.row] else { return UITableViewCell() }
+        guard let film = viewModel.films?[indexPath.row] else { return UITableViewCell() }
         cell.configureCell(film: film)
 
         return cell
@@ -74,8 +77,8 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let film = presenter.films?[indexPath.row] else { return }
-        presenter.tapOnTheFilm(film: film)
+        guard let film = viewModel.films?[indexPath.row] else { return }
+        router?.showDetail(film: film)
     }
 }
 
@@ -89,13 +92,5 @@ extension CategoryViewController: MainViewProtocol {
         set(newValue) {
             tableView = newValue
         }
-    }
-
-    func success() {
-        filmTableView.reloadData()
-    }
-
-    func failure(error: Error) {
-        print(error.localizedDescription)
     }
 }
