@@ -15,13 +15,12 @@ final class AssemblyModel: AssemblyBuilderProtocol {
         let view = CategoryViewController()
         let repository = Repository(database: CoreDataStorage())
         let dataStorageService = DataStorageService(repository: repository)
-        let presenter = CategoryPresenter(
-            view: view,
+        let viewModel = CategoryViewModel(
             movieAPIService: movieAPIService,
-            router: router,
             dataStorageService: dataStorageService
         )
-        view.presenter = presenter
+        view.viewModel = viewModel
+        view.router = router
 
         return view
     }
